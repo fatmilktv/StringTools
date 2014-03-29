@@ -14,6 +14,7 @@ import string # String tools
 import nltk # For tokenizing
 import subprocess # For subprocessing MAFFT
 import re # Regular expressions
+from collections import defaultdict
 from Bio import AlignIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -34,7 +35,7 @@ def token_consensus(x, wdir):
     '''
     # Concatenate strings and tokenize 
     regexptoken = nltk.RegexpTokenizer(pattern = '\s+', gaps = True)                           
-    y = string.join(x)
+    y = " ".join(x)
     tokens = regexptoken.tokenize(y)
     # tokens = nltk.word_tokenize(y) #word_tokenize assumes you are a sentence, so any ultimate periods are tokenize separately
 
@@ -74,7 +75,7 @@ def token_consensus(x, wdir):
     mafft = '/usr/local/bin/mafft'
     res = subprocess.check_output([mafft, '--text', temp_file])
     out_file = os.path.join(wdir, "temp_align.fasta")
-    with file(out_file, 'w') as f:
+    with open(out_file, 'wb') as f:
         f.write(res)
 
     alignres = AlignIO.read(out_file, "fasta")
@@ -86,7 +87,7 @@ def token_consensus(x, wdir):
     # Reinterpret consensus
     inv_unique_token_id = {v:k for k, v in unique_token_id.items()}
     consensus = [inv_unique_token_id[token] for token in consensus]
-    consensus = string.join(consensus, sep = " ")
+    consensus = "".join(consensus)
     
     return str(consensus)
 
@@ -113,7 +114,7 @@ def character_consensus(x, wdir):
 
     # Export results into working dir
     out_file = os.path.join(wdir, "temp_align.fasta")
-    with file(out_file, 'w') as f:
+    with open(out_file, 'wb') as f:
         f.write(res)
 
     # Import alignment
@@ -141,8 +142,8 @@ def variant_consensus(accession, field, data, method, wdir):
 
     # Find consensus in NfN data
     entry_results = defaultdict(list)
-    for k,v in entry_id.iteritems():
-        print "Reconciling transcriptions for", k
+    for k,v in entry_id.items():
+        print("Reconciling transcriptions for", k)
 
         # If entries are identical, then entry is consensus
         if len(set(v)) == 1:
@@ -151,13 +152,23 @@ def variant_consensus(accession, field, data, method, wdir):
         # If entries are not identical, use consensus
         else:
             if method == "character":
-                entry_results[k].append(character_consensus(v, wdir))
+                try:
+                    entry_results[k].append(character_consensus(v, wdir))
+                except Exception as e:
+                    print("excepts on variant_consensus-character", e)
             elif method == "token":
-                entry_results[k].append(token_consensus(v, wdir))
+                try: 
+                    entry_results[k].append(token_consensus(v, wdir))
+                except Exception as e:
+                    print("excepts on variant_consensus-token", e)
 
 
     # Convert results into dataframe [OMG I'm starting to love list comprehensions]
-    est = [str(est[0]) for est in entry_results.values()] # Necessary to index 0 and default dict values are lists
+    try:
+        est = [str(est[0]) for est in entry_results.values()] # Necessary to index 0 and default dict values are lists
+    except Exception as e:
+        print("excepts on reporting" e)
+    
     acc = [str(acc) for acc in entry_results.keys()]
     results = pd.DataFrame({str(accession):acc, str(field):est})
 

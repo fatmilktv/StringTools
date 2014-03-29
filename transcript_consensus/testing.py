@@ -16,7 +16,7 @@ test_dir = os.path.join(os.getenv("HOME"), "Desktop")
 test_example = ["12 mi. W. Oakland, Cal", "12 mi West Oakland", "12 mi. W. Oakland", "12 miles W Oakland"]
 token_example = token_consensus(test_example, test_dir)
 character_example = character_consensus(test_example, wdir = test_dir)
-'''
+
 # EVALUATING NFN TRANSCRIPTIONS AGAINST GOLD DATASET (i.e. transcribed in verbatim)
 nfn_data = pd.read_csv(os.path.join(test_dir,"Calbug_NfN.csv"))
 nfn_data = nfn_data.fillna("") # Converts all NaNs into empty strings
@@ -37,7 +37,7 @@ character_results = pd.merge(character_results, character_loc, on = "filename", 
 
 token_results = pd.merge(gold_data, token_coll, on = "filename", suffixes = ("_gold", "_consensus"))
 token_results = pd.merge(token_results, token_loc, on = "filename", suffixes = ("_gold", "_consensus"))
-'''
+
 # Some summary statistics
 x1 = character_results["Collector_consensus"] == character_results["Collector_gold"]
 x2 = character_results["Locality_consensus"] == character_results["Locality_gold"]
