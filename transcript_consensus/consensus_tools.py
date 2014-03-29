@@ -167,7 +167,7 @@ def variant_consensus(accession, field, data, method, wdir):
     try:
         est = [str(est[0]) for est in entry_results.values()] # Necessary to index 0 and default dict values are lists
     except Exception as e:
-        print("excepts on reporting" e)
+        print("excepts on reporting", e)
     
     acc = [str(acc) for acc in entry_results.keys()]
     results = pd.DataFrame({str(accession):acc, str(field):est})
