@@ -2,11 +2,11 @@ import os
 import unittest
 import pandas as pd
 
-from consensus_tools_mod import *
+from consensus_tools import *
 
 class exerciseImports(unittest.TestCase):
     
-    import consensus_tools_mod
+    import consensus_tools
     import pandas as pd
     from collections import defaultdict
     import itertools
@@ -40,8 +40,8 @@ def legacy(datadir):
     import itertools
 
     import numpy as np
-    import Levenshtein
-    import matplotlib.pyplot as plt
+    #import Levenshtein
+    #import matplotlib.pyplot as plt
 
     ## FIXME
     data_dir    = datadir;
